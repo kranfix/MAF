@@ -8,8 +8,8 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.mafpack.all;
 
-entity maf is
-generic(N: natural := 10);
+entity maftop is
+generic(M: natural := 10);
 port(
 	clk,clr: std_logic;
 	x: in number;
@@ -17,12 +17,12 @@ port(
 );
 end entity;
 
-architecture behavioral of maf is
-	signal h: numbers(0 to N-1);
+architecture behavioral of maftop is
+	signal h: numbers(0 to M-1);
 begin
 
-h(0) <= h(1) + x;
-y <= h(0) - h(N-1);
+h(0) <= h(1) + x;		-- h[n] = x[n] + h[n-1]
+y <= h(0) - h(M-1);	-- y[n] = h[n] - h[n+1-M]
 
 delays: entity work.delayer
 	generic map(ord => N-1)
