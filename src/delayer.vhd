@@ -1,10 +1,11 @@
-/* Archivo: delayer.vhd
+/* Order 'ord' Delayer
+file: delayer.vhd
 author: Frank Andre Moreno vera
-e-mail: frank.moreno@ieee.org
+e-mail: frankmoreno1993@gmail.com
 */
 library ieee;
 use ieee.std_logic_1164.all;
-use work.my_types.all;
+use work.mafpack.all;
 
 entity delayer is
 generic(ord: natural := 10);

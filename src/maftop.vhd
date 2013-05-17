@@ -1,11 +1,12 @@
-/*Moving Average Filter
+/* Moving Average Filter
+file: maftop.vhd
 author: Frank Andre Moreno vera
-e-mail: frank.moreno@gmail.com
+e-mail: frankmoreno1993@gmail.com
 */
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.my_types.all;
+use work.mafpack.all;
 
 entity maf is
 generic(N: natural := 10);

@@ -11,6 +11,9 @@ About the Moving Average Filter
 ===============================
 A Moving Average Filter is a digital filter that average of the input's last M
 term such as the following expresion:
+
         x[n] + x[n-1] + .... + x[M-1]
+
 y[n] =  -----------------------------
+
                       M
