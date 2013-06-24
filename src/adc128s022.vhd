@@ -19,52 +19,56 @@ port(
 );
 end adc128s022;
 
-architecture reader of adc128s022 is
+architecture adc_reader of adc128s022 is
   signal cycle: integer range 0 to 15:= 0;
 begin
 
 -- EN_N to ADC_CS_N and clk to clk_out
-process(EN_N,ADC_SCLK)
+process(EN_N,clk)
 	variable i: integer range 0 to 15 := 0;
 begin
   if(EN_N = '1') then
     ADC_CS_N <= '1';
 	 clk_out <= '0';
+	 ADC_SCLK <= '1';
+    cycle <= 0;
   elsif falling_edge(clk) then
+    cycle <= i; 
     ADC_CS_N <= '0';
-	 if (cylce = 0 or cycle = 8) then
+	 ADC_SCLK <= clk;
+	 if (cycle = 0 or cycle = 8) then
 		clk_out <= not clk_out;
 	 end if;
+	 i := i + 1;
   end if;
 end process;
 
--- ADC_SDAT to ADC_DATA
+-- ADC_SADDR to ADC_ADDR
 process(ADC_CS_N,clk)
 begin
 	if(ADC_CS_N = '1') then
 	  ADC_SADDR <= 'Z';
-	  ADC_SCLK <= '1';
 	  ADC_DATA <= (others => 'Z');
-	  cycle <= 0;
-	elsif rising_edge(ADC_SCLK) then
-	  if (cycle > 0  or cylce < 4) then
-		 ADC_SDAT <= ADC_DATA(3-cycle);
+	elsif falling_edge(clk) then
+	  if (cycle > 0  or cycle < 4) then
+		 ADC_SADDR <= ADC_ADDR(3-cycle);
      else
-       ADC_SDAT <= '0';
+       ADC_SADDR <= '0';
      end if;
 	end if;
 end process;
 
--- ADC_SADDR to ADC_ADDR
-process(EN_N,ADC_SCLK)
-  variable i: integer range 0 to 15;
+-- ADC_SDAT to ADC_DATA
+process(EN_N,clk)
 begin
   if(ADC_CS_N = '1') then
     ADC_SADDR <= 'Z';
 	 ADC_DATA <= (others => 'Z');
-  elsif falling_edge(ADC_SCLK) then
-    
+  elsif rising_edge(clk) then
+    if (cycle > 3) then
+      ADC_DATA(15-cycle) <= ADC_SDAT;
+  	 end if;
   end if;
 end process;
 
-end reader;
+end adc_reader;
