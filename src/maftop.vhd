@@ -1,7 +1,7 @@
 /* Moving Average Filter
 file: maftop.vhd
 author: Frank Andre Moreno vera
-e-mail: frankmoreno1993@gmail.com
+e-mail: frank.moreno@ieee.com
 */
 library ieee;
 use ieee.std_logic_1164.all;
@@ -9,12 +9,12 @@ use ieee.numeric_std.all;
 use work.mafpack.all;
 
 entity maftop is
-generic(M: natural := 10);
-port(
-	clk,clr: std_logic;
-	x: in number;
-	y: out number
-);
+	generic(M: natural := 10);
+	port(
+		clk,clr: std_logic;
+		x: in number;
+		y: out number
+	);
 end entity;
 
 architecture behavioral of maftop is
