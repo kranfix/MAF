@@ -25,12 +25,12 @@ h(0) <= h(1) + x;		-- h[n] = x[n] + h[n-1]
 y <= h(0) - h(M-1);	-- y[n] = h[n] - h[n+1-M]
 
 delays: entity work.delayer
-	generic map(ord => N-1)
+	generic map(ord => M-1)
 	port map( 
 		clk	=> clk,
 		clr	=> clr,
 		input	=> h(0),
-		output=> h(1 to N-1)
+		output=> h(1 to M-1)
 	);
 
 end behavioral;
