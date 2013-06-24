@@ -9,28 +9,28 @@ use ieee.numeric_std.all;
 use work.mafpack.all;
 
 entity maftop is
-	generic(M: natural := 10);
-	port(
-		clk,clr: std_logic;
-		x: in number;
-		y: out number
-	);
+  generic(M: natural := 1);
+  port(
+    clk,clr: std_logic;
+    x: in number;
+    y: out number
+  );
 end entity;
 
 architecture behavioral of maftop is
-	signal h: numbers(0 to M-1);
+  signal h: numbers(0 to M);
 begin
 
-h(0) <= h(1) + x;		-- h[n] = x[n] + h[n-1]
-y <= h(0) - h(M-1);	-- y[n] = h[n] - h[n+1-M]
+h(0) <= h(1) + x;	  -- h[n] = x[n] + h[n-1]
+y <= h(0) - h(M-1); -- y[n] = h[n] - h[n+1-M]
 
 delays: entity work.delayer
-	generic map(ord => M-1)
-	port map( 
-		clk	=> clk,
-		clr	=> clr,
-		input	=> h(0),
-		output=> h(1 to M-1)
-	);
+  generic map(ord => M)
+  port map( 
+    clk    => clk,
+    clr    => clr,
+    input  => h(0),
+    output => h(1 to M)
+  );
 
 end behavioral;
