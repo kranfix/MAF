@@ -12,10 +12,10 @@ port(
   EN_N,clk: in std_logic;
   ADC_SDAT: in std_logic;
   ADC_ADDR: in std_logic_vector(2 downto 0);
-  ADC_CS_N: buffer std_logic;
   ADC_SADDR, ADC_SCLK: out std_logic;
-  ADC_DATA: out std_logic_vector(11 downto 0)
-  clk_out:	out std_logic;
+  ADC_DATA: out std_logic_vector(11 downto 0);
+  ADC_CS_N: buffer std_logic;
+  clk_out:	buffer std_logic
 );
 end adc128s022;
 
@@ -25,14 +25,16 @@ begin
 
 -- EN_N to ADC_CS_N and clk to clk_out
 process(EN_N,ADC_SCLK)
-	i: integer range 0 to 15
+	variable i: integer range 0 to 15 := 0;
 begin
   if(EN_N = '1') then
-    ADC_CS_N = '1';
-	 clk_out = '0';
+    ADC_CS_N <= '1';
+	 clk_out <= '0';
   elsif falling_edge(clk) then
-    ADC_CS_N = '0';
-	 if ()
+    ADC_CS_N <= '0';
+	 if (cylce = 0 or cycle = 8) then
+		clk_out <= not clk_out;
+	 end if;
   end if;
 end process;
 
@@ -45,7 +47,11 @@ begin
 	  ADC_DATA <= (others => 'Z');
 	  cycle <= 0;
 	elsif rising_edge(ADC_SCLK) then
-		if (cycle = )
+	  if (cycle > 0  or cylce < 4) then
+		 ADC_SDAT <= ADC_DATA(3-cycle);
+     else
+       ADC_SDAT <= '0';
+     end if;
 	end if;
 end process;
 
@@ -55,10 +61,9 @@ process(EN_N,ADC_SCLK)
 begin
   if(ADC_CS_N = '1') then
     ADC_SADDR <= 'Z';
-	 ADC_SCLK <= '1';
 	 ADC_DATA <= (others => 'Z');
   elsif falling_edge(ADC_SCLK) then
-
+    
   end if;
 end process;
 
