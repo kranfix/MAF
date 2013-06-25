@@ -1,11 +1,10 @@
 /* ADC Reader
-file:	adcreader.vhd
+file:	adc128s022.vhd
 author: Frank Andre Moreno vera
 e-mail: frankmoreno1993@gmail.com
 */
 library ieee;
 use ieee.std_logic_1164.all;
-use work.mafpack.all;
 
 entity adc128s022 is
 port(
@@ -15,7 +14,7 @@ port(
   ADC_SADDR, ADC_SCLK: out std_logic;
   ADC_DATA: out std_logic_vector(11 downto 0);
   ADC_CS_N: buffer std_logic;
-  clk_out:  buffer std_logic
+  filter_clk:  buffer std_logic
 );
 end adc128s022;
 
@@ -23,13 +22,13 @@ architecture adc_reader of adc128s022 is
   signal cycle: integer range 0 to 15:= 0;
 begin
 
--- EN_N to ADC_CS_N and clk to clk_out
+-- EN_N to ADC_CS_N and clk to filter_clk
 process(EN_N,clk)
   variable i: integer range 0 to 15 := 0;
 begin
   if(EN_N = '1') then
     ADC_CS_N <= '1';
-    clk_out <= '0';
+    filter_clk <= '0';
     ADC_SCLK <= '1';
     cycle <= 0;
   elsif falling_edge(clk) then
@@ -37,7 +36,7 @@ begin
     ADC_CS_N <= '0';
     ADC_SCLK <= clk;
     if (cycle = 0 or cycle = 8) then
-      clk_out <= not clk_out;
+      filter_clk <= not filter_clk;
     end if;
     i := i + 1;
   end if;
@@ -48,7 +47,6 @@ process(ADC_CS_N,clk)
 begin
   if(ADC_CS_N = '1') then
     ADC_SADDR <= 'Z';
-    ADC_DATA <= (others => 'Z');
   elsif falling_edge(clk) then
     if (cycle > 0  or cycle < 4) then
       ADC_SADDR <= ADC_ADDR(3-cycle);
@@ -62,7 +60,6 @@ end process;
 process(EN_N,clk)
 begin
   if(ADC_CS_N = '1') then
-    ADC_SADDR <= 'Z';
     ADC_DATA <= (others => 'Z');
   elsif rising_edge(clk) then
     if (cycle > 3) then
