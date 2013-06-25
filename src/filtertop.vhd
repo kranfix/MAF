@@ -6,9 +6,9 @@ e-mail: frank.moreno@ieee.com
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.mafpack.all;
+use work.filterpack.all;
 
-entity maftop is
+entity filtertop is
   generic(M: natural := 10);
   port(
     clk,clr: std_logic;
@@ -20,7 +20,7 @@ entity maftop is
   );
 end entity;
 
-architecture behavioral of maftop is
+architecture behavioral of filtertop is
   constant ADC_ADDR: std_logic_vector(2 downto 0) := "000";
   signal filter_clk: std_logic;
   signal ADC_DATA:   std_logic_vector(11 downto 0);
@@ -48,22 +48,9 @@ ADC_reading: entity work.adc128s022
     ADC_CS_N   => ADC_CS_N,
     filter_clk => filter_clk
   );
-  
-Asign_x: process(ADC_DATA)
-begin
-  x <= (others => '0'); 
-  for i in ADC_DATA'range loop
-    if(ADC_DATA(i) = '1') then
-      x(i+4) <= '1';
-    end if;
-  end loop;
-end process;
 
-Filter: block
-begin
-h(0) <= h(1) + x;   -- h[n] = x[n] + h[n-1]
-y <= h(0) - h(M-1); -- y[n] = h[n] - h[n+1-M]
-end block;
+Asign_x: x <= DATA_TO_X(ADC_DATA);
+Filter: MAF_filter(x,h,y);
 
 delays: entity work.delayer
   generic map(ord => M)

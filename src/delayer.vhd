@@ -5,7 +5,7 @@ e-mail: frankmoreno1993@gmail.com
 */
 library ieee;
 use ieee.std_logic_1164.all;
-use work.mafpack.all;
+use work.filterpack.all;
 
 entity delayer is
 generic(ord: natural := 10);
