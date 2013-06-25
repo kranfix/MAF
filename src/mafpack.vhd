@@ -1,4 +1,5 @@
-/* file: mafpack.vhd
+/* Package to define types
+file:   mafpack.vhd
 author: Frank Andre Moreno vera
 e-mail: frankmoreno1993@gmail.com
 */
