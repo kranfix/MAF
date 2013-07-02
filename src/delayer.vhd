@@ -1,4 +1,4 @@
-/* Order 'ord' Delayer
+/* Order M Delayer
 file: delayer.vhd
 author: Frank Andre Moreno vera
 e-mail: frankmoreno1993@gmail.com
@@ -8,12 +8,12 @@ use ieee.std_logic_1164.all;
 use work.filterpack.all;
 
 entity delayer is
-generic(ord: natural := 10);
-port(
-  clk,clr: in std_logic;
-  input: in number;
-  output: buffer numbers(1 to ord)
-);
+  generic(M: natural);
+  port(
+    clk,clr: in std_logic;
+    input:   in number;
+    output:  buffer numbers(1 to M)
+  );
 end entity;
 
 architecture orderN of delayer is

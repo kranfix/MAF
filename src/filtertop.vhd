@@ -9,56 +9,64 @@ use ieee.numeric_std.all;
 use work.filterpack.all;
 
 entity filtertop is
-  generic(M: natural := 10);
+  generic(M: natural := 11);
   port(
-    clk,clr: std_logic;
-    y: out number;
-    ADC_SDAT: in std_logic;
-    ADC_SADDR: out std_logic;
-    ADC_SCLK: out std_logic;
-    ADC_CS_N: out std_logic
+    clk,clr:  in  std_logic;
+    y:        out number;
+    ad_sdat:  in  std_logic;
+    ad_saddr: out std_logic;
+    ad_cs_n:  out std_logic
   );
 end entity;
 
 architecture behavioral of filtertop is
-  constant ADC_ADDR: std_logic_vector(2 downto 0) := "000";
-  signal filter_clk: std_logic;
-  signal ADC_DATA:   std_logic_vector(11 downto 0);
-  signal ADC_CLK:    std_logic;
+  constant ad_addr:  std_logic_vector(2 downto 0) := "000";
+  signal sample_clk: std_logic;
+  signal ad_data:    std_logic_vector(11 downto 0);
+  signal sclK:       std_logic;
   signal x:          number;
   signal h:          numbers(0 to M);
 begin
 
 Frec_divider: entity work.frecuency_divider
   port map(
-    reset   => clr,
+    rst     => clr,
     clk_in  => clk,
-    clk_out => ADC_CLK
+    clk_out => SCLK
   );
 
 ADC_reading: entity work.adc128s022
   port map(
-    EN_N       => not clr,
-    clk        => ADC_CLK,
-    ADC_ADDR   => ADC_ADDR,
-    ADC_SADDR  => ADC_SADDR,
-    ADC_SDAT   => ADC_SDAT,
-    ADC_DATA   => ADC_DATA,
-    ADC_SCLK   => ADC_SCLK,
-    ADC_CS_N   => ADC_CS_N,
-    filter_clk => filter_clk
+    en_n       => not clr,
+    ad_sclk    => sclk,
+    ad_addr    => ad_addr,
+    ad_saddr   => ad_saddr,
+    ad_sdat    => ad_sdat,
+    ad_data    => ad_data,
+    ad_cs_n    => ad_cs_n,
+    sample_clk => sample_clk
   );
 
-Asign_x: x <= DATA_TO_X(ADC_DATA);
-Filter: MAF_filter(x,h,y);
+Asign_x: x <= slv_to_num(ad_data);
+Filter:  MAF_filter(x,h,y);
 
 delays: entity work.delayer
-  generic map(ord => M)
+  generic map(M => M)
   port map( 
-    clk    => filter_clk,
+    clk    => sample_clk,
     clr    => clr,
     input  => h(0),
-    output => h(1 to M)
+    output => h(1 to h'high)
   );
+
+/*
+DAC_writer: entity work.dac121s101
+  port map(
+    go    =>: in STD_LOGIC;
+    da_a  =>: in STD_LOGIC_VECTOR (11 downto 0);
+    da_b  =>: in STD_LOGIC_VECTOR (11 downto 0);
+    pmod  =>: out STD_LOGIC_VECTOR (3 downto 0);
+    clk   =>: in STD_LOGIC
+  );*/
 
 end behavioral;

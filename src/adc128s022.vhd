@@ -8,13 +8,14 @@ use ieee.std_logic_1164.all;
 
 entity adc128s022 is
 port(
-  EN_N,clk: in std_logic;
-  ADC_SDAT: in std_logic;
-  ADC_ADDR: in std_logic_vector(2 downto 0);
-  ADC_SADDR, ADC_SCLK: out std_logic;
-  ADC_DATA: out std_logic_vector(11 downto 0);
-  ADC_CS_N: buffer std_logic;
-  filter_clk:  buffer std_logic
+  en_n:       in std_logic;
+  ad_sclk:    in std_logic;
+  ad_sdat:    in std_logic;
+  ad_addr:    in std_logic_vector(2 downto 0);
+  ad_saddr:   out std_logic;
+  ad_data:    out std_logic_vector(11 downto 0);
+  ad_cs_n:    buffer std_logic;
+  sample_clk: buffer std_logic
 );
 end adc128s022;
 
@@ -23,47 +24,46 @@ architecture adc_reader of adc128s022 is
 begin
 
 -- EN_N to ADC_CS_N and clk to filter_clk
-process(EN_N,clk)
+process(en_n,ad_sclk)
   variable i: integer range 0 to 15 := 0;
 begin
   if(EN_N = '1') then
-    ADC_CS_N <= '1';
-    filter_clk <= '0';
-    ADC_SCLK <= '1';
+    ad_cs_n <= '1';
+    sample_clk <= '0';
     cycle <= 0;
-  elsif falling_edge(clk) then
+    i := 0;
+  elsif falling_edge(ad_sclk) then
     cycle <= i; 
-    ADC_CS_N <= '0';
-    ADC_SCLK <= clk;
+    ad_cs_n <= '0';
     if (cycle = 0 or cycle = 8) then
-      filter_clk <= not filter_clk;
+      sample_clk <= not sample_clk;
     end if;
     i := i + 1;
   end if;
 end process;
 
 -- ADC_SADDR to ADC_ADDR
-process(ADC_CS_N,clk)
+process(ad_cs_n,ad_sclk)
 begin
-  if(ADC_CS_N = '1') then
-    ADC_SADDR <= 'Z';
-  elsif falling_edge(clk) then
-    if (cycle > 0  or cycle < 4) then
-      ADC_SADDR <= ADC_ADDR(3-cycle);
+  if(ad_cs_n = '1') then
+    ad_saddr <= 'Z';
+  elsif falling_edge(ad_sclk) then
+    if(cycle > 0 or cycle < 4) then
+      ad_saddr <= ad_addr(3-cycle);
     else
-      ADC_SADDR <= '0';
+      ad_saddr <= '0';
     end if;
   end if;
 end process;
 
 -- ADC_SDAT to ADC_DATA
-process(EN_N,clk)
+process(en_n,ad_sclk)
 begin
-  if(ADC_CS_N = '1') then
-    ADC_DATA <= (others => 'Z');
-  elsif rising_edge(clk) then
+  if(ad_cs_n = '1') then
+    ad_data <= (others => 'Z');
+  elsif rising_edge(ad_sclk) then
     if (cycle > 3) then
-      ADC_DATA(15-cycle) <= ADC_SDAT;
+      ad_data(15-cycle) <= ad_sdat;
     end if;
   end if;
 end process;

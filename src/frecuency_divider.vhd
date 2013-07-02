@@ -13,7 +13,7 @@ entity frecuency_divider is
     whised_frec: integer := 800   -- in khz
   );
   port(
-    reset: in std_logic;
+    rst:     in std_logic;
     clk_in:  in std_logic;
     clk_out: buffer std_logic
   );
@@ -26,7 +26,7 @@ begin
 process(clk_in)
   variable i: integer range 0 to num_of_cycles-1;
 begin
-  if reset = '1' then
+  if rst = '1' then
     clk_out <= '0';
     i := 0;
   elsif rising_edge(clk_in) then
